@@ -1,7 +1,7 @@
 import google.generativeai as genai
 import json
 from seqeval.metrics import classification_report, f1_score, precision_score, recall_score
-from prompts import prompt, texts_to_annotate
+from data.prompts import prompt, texts_to_annotate
 
 
 API_KEY = "AIzaSyDqwBO7fYRUtmWktEXnXTzn-RX67zO2Pi4"

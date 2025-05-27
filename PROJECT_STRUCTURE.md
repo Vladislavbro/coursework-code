@@ -5,20 +5,18 @@
 │
 ├── config.py                  # Конфигурация экспериментов и путей
 ├── data_utils.py              # Функции по работе с JSON
-├── embedding_generator.py     # Генерация эмбеддингов
-├── example_selector.py        # Выбор примеров для prompt'ов
-├── prompt_generator.py        # Генерация prompt'ов для LLM
-├── post_verification.py       # Пост-обработка и верификация разметки
-├── run_experiment.py          # Запуск экспериментов
+├── prompt_generator.py        # Генерация prompt'ов для LLM и сохранение ответов
+├── experiments.py             # Запуск экспериментов
 ├── evaluation.py              # Оценка качества разметки
+├── main.py                    # Основной файл для запуска всего проекта
 │
 ├── data/
-│   ├── wikiann_train.json     # MRC-формат обучающей выборки
-│   └── wikiann_test.json      # MRC-тестовая выборка
+│   └── wikiann_100.json       # тестовая выборка
+│   └── wikiann_18.json        # обучающая выборка
+│   └── response.json          # Ответы LLM
 │   └── prompts.py             # Файл с разными текстами промптов
 ├── results/
-│   ├── experiments.db         # SQLite-база результатов
-│   └── results.csv            # (альтернатива: результаты в CSV)
+│   └── results.csv            # Результаты экспериментов в CSV
 │
 └── notebooks/
     └── analysis.ipynb         # Анализ и визуализация результатов
@@ -43,26 +41,16 @@
 **Цель:** понять, как меняется качество при росте числа демонстраций в prompt.  
 - **Параметры:**  
   - mode = random  
-  - shots ∈ {0, 1, 3, 5}  
+  - shots ∈ {0, 5, 10, 15}  
   - model = gemma-3n-e4b-it
   - post-verification = off  
 
 ---
 
-## 2. Example-Selection  
-**Цель:** сравнить random vs kNN-retrieval (по эмбеддингам).  
-- **Параметры:**  
-  - shots = 3  
-  - mode ∈ {random, knn}  
-  - model = gemma-3n-e4b-it  
-  - post-verification = off  
-
----
-
-## 3. Prompt-Style  
+## 2. Prompt-Style  
 **Цель:** оценить, влияет ли формат подсказки (JSON-schema vs Chain-of-Thought).  
 - **Параметры:**  
-  - shots = 3  
+  - shots = 5  
   - mode = knn  
   - style ∈ {json-schema, cot}  
   - model = gemma-3n-e4b-it  
@@ -70,19 +58,19 @@
 
 ---
 
-## 4. Model-Variant  
-**Цель:** сравнить разные LLM-движки.  
+## 3. Model-Variant  
+**Цель:** сравнить разные LLM.  
 - **Параметры:**  
-  - shots = 3, mode = knn, style = json-schema  
+  - shots = best option from experiment 1, style = best option from experiment 2  
   - model ∈ {gemma-3n-e4b-it и еще какие-то модели}  
   - post-verification = off  
 
 ---
 
-## 5. Post-Verification  
+## 4. Post-Verification  
 **Цель:** измерить прирост precision от self-verification.  
 - **Параметры:**  
-  - shots = 3, mode = knn, style = json-schema, model = gemma-3n-e4b-it  
+  - shots = best option from experiment 1, style = best option from experiment 2, model = best option from experiment 3
   - post-verification ∈ {off, on}  
 
 ---
@@ -90,11 +78,17 @@
 
 ## Данные и Метрики в базе данных
 
-- **Промпт:**  
-  Промпты, которые использовались в эксперименте.
+- **Shots**  
+  Количество примеров, которые использовались в промпте.
 
 - **Model Name**  
-  Используемая модель 
+  Используемая модель LLM
+
+- **Style**  
+  Стиль промпта (JSON-schema или Chain-of-Thought)
+
+- **Post-Verification**  
+  Пост-обработка и верификация разметки (yes/no)
 
 - **Accuracy:**  
   Отдельно accuracy (точность) и их динамика.
