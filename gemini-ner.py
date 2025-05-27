@@ -10,21 +10,21 @@ model = genai.GenerativeModel('gemma-3n-e4b-it')
 
 # 1. Получаем ответ от Gemini
 response = model.generate_content(prompt)
-raw_response_text = response.text
+raw_response = response.text
 
 # Удаляем markdown-обертку, если она есть (```json ... ```)
-cleaned_response_text = raw_response_text
-if cleaned_response_text.startswith("```json"):
-    cleaned_response_text = cleaned_response_text.strip("```json\n")
-    cleaned_response_text = cleaned_response_text.strip("\n```")
-    cleaned_response_text = cleaned_response_text.strip()
+cleaned_response = raw_response
+if cleaned_response.startswith("```json"):
+    cleaned_response = cleaned_response.strip("```json\n")
+    cleaned_response = cleaned_response.strip("\n```")
+    cleaned_response = cleaned_response.strip()
 
 # Парсим очищенный JSON-текст
-gemini_data_list = json.loads(cleaned_response_text)
+gemini_data = json.loads(cleaned_response)
 
 # Сохраняем обработанный ответ Gemini в data/response.json
 with open("data/response.json", "w", encoding="utf-8") as f:
-    json.dump(gemini_data_list, f, ensure_ascii=False, indent=2)
+    json.dump(gemini_data, f, ensure_ascii=False, indent=2)
 
 # Загружаем эталонные аннотации и предсказания Gemini
 with open("data/wikiann_100.json", "r", encoding="utf-8") as f:
@@ -55,7 +55,9 @@ for gold_set, pred_set in zip(gold_entities, pred_entities):
 precision = TP / (TP + FP) if (TP + FP) > 0 else 0.0
 recall = TP / (TP + FN) if (TP + FN) > 0 else 0.0
 f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0.0
+accuracy = TP / (TP + FP + FN) if (TP + FP + FN) > 0 else 0.0
 
 print(f"Precision: {precision:.3f}")
 print(f"Recall:    {recall:.3f}")
 print(f"F1:        {f1:.3f}")
+print(f"Accuracy:  {accuracy:.3f}")

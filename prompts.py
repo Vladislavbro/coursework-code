@@ -3,7 +3,7 @@ import json
 # Загружаем примеры для примера формата (например, из wikiann_20.json)
 with open("data/wikiann_18.json", "r", encoding="utf-8") as f:
     all_examples = json.load(f)
-example_json = all_examples[:5]  # Уменьшил количество примеров для краткости промпта
+example_json = all_examples[:10]  # количество примеров для краткости промпта
 
 # Загружаем тексты для аннотации из wikiann_100.json 
 with open("data/wikiann_100.json", "r", encoding="utf-8") as f:
