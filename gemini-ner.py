@@ -1,18 +1,61 @@
 import google.generativeai as genai
-from datasets import load_dataset
 import json
-import time
-import re
-from evaluate import load as load_metric
-from seqeval.metrics import classification_report, f1_score, precision_score, recall_score, accuracy_score
-from prompts import prompt
+from seqeval.metrics import classification_report, f1_score, precision_score, recall_score
+from prompts import prompt, texts_to_annotate
 
 
 API_KEY = "AIzaSyDqwBO7fYRUtmWktEXnXTzn-RX67zO2Pi4"
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel('gemma-3n-e4b-it')
 
+# 1. Получаем ответ от Gemini
 response = model.generate_content(prompt)
+raw_response_text = response.text
 
-with open("data/response.txt", "w", encoding="utf-8") as f:
-    f.write(response.text)
+# Удаляем markdown-обертку, если она есть (```json ... ```)
+cleaned_response_text = raw_response_text
+if cleaned_response_text.startswith("```json"):
+    cleaned_response_text = cleaned_response_text.strip("```json\n")
+    cleaned_response_text = cleaned_response_text.strip("\n```")
+    cleaned_response_text = cleaned_response_text.strip()
+
+# Парсим очищенный JSON-текст
+gemini_data_list = json.loads(cleaned_response_text)
+
+# Сохраняем обработанный ответ Gemini в data/response.json
+with open("data/response.json", "w", encoding="utf-8") as f:
+    json.dump(gemini_data_list, f, ensure_ascii=False, indent=2)
+
+# Загружаем эталонные аннотации и предсказания Gemini
+with open("data/wikiann_100.json", "r", encoding="utf-8") as f:
+    gold = json.load(f)
+with open("data/response.json", "r", encoding="utf-8") as f:
+    pred = json.load(f)
+
+# Сравниваем только первые N примеров (как в prompts.py)
+N = len(pred)
+gold = gold[:N]
+
+def extract_entities(json_data):
+    all_entities = []
+    for item in json_data:
+        entities = set((e["text"], e["label"]) for e in item.get("entities", []))
+        all_entities.append(entities)
+    return all_entities
+
+gold_entities = extract_entities(gold)
+pred_entities = extract_entities(pred)
+
+TP = FP = FN = 0
+for gold_set, pred_set in zip(gold_entities, pred_entities):
+    TP += len(gold_set & pred_set)
+    FP += len(pred_set - gold_set)
+    FN += len(gold_set - pred_set)
+
+precision = TP / (TP + FP) if (TP + FP) > 0 else 0.0
+recall = TP / (TP + FN) if (TP + FN) > 0 else 0.0
+f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0.0
+
+print(f"Precision: {precision:.3f}")
+print(f"Recall:    {recall:.3f}")
+print(f"F1:        {f1:.3f}")
