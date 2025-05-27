@@ -8,7 +8,7 @@ from request_generator import generate_and_save_response
 from data_utils import load_mrc, save_json
 
 CSV_HEADERS = [
-    "Shots", "Model Name", "Style", "Total Texts", "Texts Per Batch",
+    "Shots", "Difficult Examples", "Model Name", "Style", "Total Texts", "Texts Per Batch",
     "Post-Verification", "Accuracy", "Precision", "Recall", "F1", "Token Usage"
 ]
 
@@ -28,16 +28,19 @@ def run_batch_experiment():
     model_name = config.BASE_EXPERIMENT_PARAMS["model"]
     prompt_style = config.BASE_EXPERIMENT_PARAMS["prompt_style"]
     post_verification = config.BASE_EXPERIMENT_PARAMS["post_verification"]
+    use_difficult_examples = config.BASE_EXPERIMENT_PARAMS["use_difficult_examples"]
     
     # Загружаем все тексты для разметки
     all_texts = load_mrc(config.TEST_FILE_PATH)
-    texts_to_annotate = [item["text"] for item in all_texts[:config.NUM_TEXTS_TO_ANNOTATE]]
+    total_texts = config.BASE_EXPERIMENT_PARAMS["total_texts"]
+    batch_size = config.BASE_EXPERIMENT_PARAMS["batch_size"]
+    texts_to_annotate = [item["text"] for item in all_texts[:total_texts]]
     
     # Разбиваем на батчи
-    batches = [texts_to_annotate[i:i + config.BATCH_SIZE] 
-               for i in range(0, len(texts_to_annotate), config.BATCH_SIZE)]
+    batches = [texts_to_annotate[i:i + batch_size] 
+               for i in range(0, len(texts_to_annotate), batch_size)]
     
-    print(f"Обработка {len(texts_to_annotate)} текстов батчами по {config.BATCH_SIZE}")
+    print(f"Обработка {len(texts_to_annotate)} текстов батчами по {batch_size}")
     print(f"Всего батчей: {len(batches)}")
     
     all_predictions = []
@@ -47,7 +50,7 @@ def run_batch_experiment():
     for batch_idx, batch_texts in enumerate(batches):
         print(f"Обработка батча {batch_idx + 1}/{len(batches)}...")
         
-        prompt_text = get_batch_prompt_string(num_shots, batch_texts)
+        prompt_text = get_batch_prompt_string(num_shots, batch_texts, use_difficult_examples)
         batch_file_path = config.DATA_DIR / f"batch_{batch_idx + 1}.json"
         
         token_usage = generate_and_save_response(prompt_text, model_name, batch_file_path)
@@ -66,16 +69,16 @@ def run_batch_experiment():
     gold_file_path = config.DATA_DIR / "wikiann_100.json"
     metrics = run_evaluation(gold_file_path, final_pred_file_path)
     
-    total_texts = config.NUM_TEXTS_TO_ANNOTATE
-    texts_per_batch = config.BATCH_SIZE
+    # total_texts и batch_size уже определены выше
     
     actual_metrics = metrics if metrics else {}
 
     experiment_data_to_save = {
         "Shots": num_shots,
+        "Difficult Examples": "Да" if use_difficult_examples else "Нет",
         "Model Name": model_name,
         "Total Texts": total_texts,
-        "Texts Per Batch": texts_per_batch,
+        "Texts Per Batch": batch_size,
         "Style": prompt_style,
         "Post-Verification": str(post_verification),
         "Accuracy": actual_metrics.get("accuracy"),

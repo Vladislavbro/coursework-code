@@ -21,15 +21,14 @@ AVAILABLE_MODELS = [
     "gemini-2.0-flash"
 ]
 
-# --- Параметры разметки ---
-NUM_TEXTS_TO_ANNOTATE = 10  
-BATCH_SIZE = 5              
-
 # --- Базовые параметры для одного запуска эксперимента ---
 BASE_EXPERIMENT_PARAMS = {
     "model": DEFAULT_MODEL_NAME,
     "shots": 6,
+    "total_texts": 10,
+    "batch_size": 5,
     "example_selection_mode": "random",
     "prompt_style": "json-schema",
     "post_verification": False,
+    "use_difficult_examples": True,
 }
