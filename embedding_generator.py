@@ -1,9 +1,10 @@
 from sentence_transformers import SentenceTransformer
 from data_utils import load_mrc
+from config import TRAIN_FILE_PATH
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
-def generate_embeddings(data_path="data/wikiann_18.json"):
+def generate_embeddings(data_path=TRAIN_FILE_PATH):
     """
     Загружает тексты из JSON-файла, генерирует для них эмбеддинги и возвращает их.
 

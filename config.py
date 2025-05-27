@@ -4,15 +4,11 @@ import os
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # --- Директории проекта ---
-BASE_DIR = Path(__file__).resolve().parent
-DATA_DIR = BASE_DIR / "data"
-RESULTS_DIR = BASE_DIR / "results"
-NOTEBOOKS_DIR = BASE_DIR / "notebooks"
+DATA_DIR = Path(__file__).resolve().parent / "data"
 
 # --- Пути к файлам данных ---
 TRAIN_FILE_PATH = DATA_DIR / "wikiann_18.json"
 TEST_FILE_PATH = DATA_DIR / "wikiann_100.json"
-PROMPTS_FILE_PATH = DATA_DIR / "prompts.py"
 
 # --- Пути к файлам результатов ---
 CSV_RESULTS_PATH = DATA_DIR / "results.csv"
@@ -25,10 +21,14 @@ AVAILABLE_MODELS = [
     "gemini-2.0-flash"
 ]
 
+# --- Параметры разметки ---
+NUM_TEXTS_TO_ANNOTATE = 10  
+BATCH_SIZE = 5              
+
 # --- Базовые параметры для одного запуска эксперимента ---
 BASE_EXPERIMENT_PARAMS = {
     "model": DEFAULT_MODEL_NAME,
-    "shots": 0,
+    "shots": 6,
     "example_selection_mode": "random",
     "prompt_style": "json-schema",
     "post_verification": False,

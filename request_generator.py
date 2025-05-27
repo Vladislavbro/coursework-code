@@ -33,7 +33,7 @@ def main():
     Основная функция: генерирует ответ от LLM на основе глобального промпта
     и сохраняет его в файл.
     """
-    from data.prompts import get_prompt_string
+    from prompts import get_prompt_string
     model_name_to_use = config.DEFAULT_MODEL_NAME
     output_path = config.DATA_DIR / "response.json"
 
