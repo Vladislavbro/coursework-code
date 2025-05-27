@@ -28,21 +28,6 @@ def generate_and_save_response(prompt_text: str, model_name: str, output_path: s
     save_json(gemini_data, output_path)
     return token_usage
 
-def main():
-    """
-    Основная функция: генерирует ответ от LLM на основе глобального промпта
-    и сохраняет его в файл.
-    """
-    from prompts import get_prompt_string
-    model_name_to_use = config.DEFAULT_MODEL_NAME
-    output_path = config.DATA_DIR / "response.json"
-
-    print(f"Генерация ответа с использованием модели: {model_name_to_use}...")
-    
-    prompt_text = get_prompt_string(num_shots=config.BASE_EXPERIMENT_PARAMS["shots"])
-    token_usage = generate_and_save_response(prompt_text, model_name_to_use, output_path)
-    print(f"Ответ успешно сохранен в {output_path}, использовано токенов: {token_usage}")
-
 if __name__ == "__main__":
-    main()
+    print("Этот модуль предназначен для импорта, а не для прямого запуска.")
 
