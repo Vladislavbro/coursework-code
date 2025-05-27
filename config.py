@@ -24,9 +24,9 @@ AVAILABLE_MODELS = [
 # --- Базовые параметры для одного запуска эксперимента ---
 BASE_EXPERIMENT_PARAMS = {
     "model": DEFAULT_MODEL_NAME,
-    "shots": 6,
-    "total_texts": 40,
-    "batch_size": 5,
+    "shots": 10,
+    "total_texts": 100,
+    "batch_size": 10,
     "example_selection_mode": "random",
     "prompt_style": "json-schema",
     "post_verification": False,
