@@ -51,8 +51,9 @@ def run_evaluation(gold_file_path, pred_file_path):
     print(f"Precision: {metrics['precision']:.3f}")
     print(f"Recall:    {metrics['recall']:.3f}")
     print(f"F1:        {metrics['f1']:.3f}")
-    print(f"Accuracy:  {metrics['accuracy']:.3f} (Note: Accuracy definition might vary for NER)")
-    print(f"TP: {metrics['TP']}, FP: {metrics['FP']}, FN: {metrics['FN']}")
+    print(f"Accuracy:  {metrics['accuracy']:.3f} ")
+
+    return metrics
 
 if __name__ == "__main__":
     # Пути к файлам должны соответствовать тем, что используются/генерируются в проекте
