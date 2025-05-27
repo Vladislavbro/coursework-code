@@ -25,7 +25,7 @@ AVAILABLE_MODELS = [
 BASE_EXPERIMENT_PARAMS = {
     "model": DEFAULT_MODEL_NAME,
     "shots": 6,
-    "total_texts": 10,
+    "total_texts": 20,
     "batch_size": 5,
     "example_selection_mode": "random",
     "prompt_style": "json-schema",
